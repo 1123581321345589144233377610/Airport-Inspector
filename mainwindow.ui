@@ -54,7 +54,7 @@
            <second>0</second>
            <year>2016</year>
            <month>9</month>
-           <day>15</day>
+           <day>14</day>
           </datetime>
          </property>
          <property name="maximumDateTime">
@@ -104,7 +104,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QTableWidget" name="tableWidget"/>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QTableWidget" name="tableWidget"/>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QPushButton" name="getFlightSchedule">

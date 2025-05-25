@@ -32,3 +32,8 @@ void database::ConnectToDataBase(QVector<QString> data)
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     thread->start();
 }
+
+database::~database()
+{
+    delete dataBase;
+}

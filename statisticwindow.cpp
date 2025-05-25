@@ -41,7 +41,7 @@ void statisticwindow::DisplayAnnualLoadGraphic(QChartView *chartView)
         QLayoutItem* item = ui->annualLoadLayout->itemAt(index);
         if(QWidget* widget = item->widget()){
             ui->annualLoadLayout->removeWidget(widget);
-            widget->deleteLater();
+            delete widget;
         }
     }
     ui->annualLoadLayout->addWidget(chartView);
@@ -54,7 +54,7 @@ void statisticwindow::DisplayMonthlyLoadGraphic(QChartView *chartView)
         QLayoutItem* item = ui->monthlyLoadLayout->itemAt(index);
         if(QWidget* widget = item->widget()){
             ui->monthlyLoadLayout->removeWidget(widget);
-            widget->deleteLater();
+            delete widget;
         }
     }
     ui->monthlyLoadLayout->addWidget(chartView);

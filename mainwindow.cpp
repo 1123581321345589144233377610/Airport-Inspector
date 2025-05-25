@@ -48,7 +48,6 @@ void MainWindow::ReceiveListOfAirports()
 void MainWindow::GetFlightShedule()
 {
     ui->tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     QString airportCode = ui->comboBox->currentData().toString();
     QDate selectedDate = ui->dateEdit->date();
     QString direction = (ui->radioButtonDeparture->isChecked()) ? "departure" : "arrival";
@@ -104,9 +103,10 @@ void MainWindow::GetFlightShedule()
             ui->tableWidget->setItem(rowCounter, 0, flightItem);
             ui->tableWidget->setItem(rowCounter, 1, timeItem);
             ui->tableWidget->setItem(rowCounter, 2, airportItem);
+            ui->tableWidget->resizeColumnsToContents();
             ++rowCounter;
         }
-        ui->tableWidget->resizeColumnsToContents();
+        ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     }
 }
 
@@ -152,7 +152,7 @@ void MainWindow::GetAnnualLoadGraphic()
         barGraph->attachAxis(axisY);
         chart->legend()->setVisible(true);
         chart->legend()->setAlignment(Qt::AlignBottom);
-        QChartView* chartView = new QChartView(chart);
+        QChartView* chartView = new QChartView(chart, dialog);
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->setVisible(true);
         emit dialog->SendAnnualLoadGraphic(chartView);
@@ -234,7 +234,7 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         lineGraph->attachAxis(axisY);
         chart->legend()->setVisible(true);
         chart->legend()->setAlignment(Qt::AlignBottom);
-        QChartView* chartView = new QChartView(chart);
+        QChartView* chartView = new QChartView(chart, dialog);
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->setVisible(true);
         emit dialog->SendMonthlyLoadGraphic(chartView);

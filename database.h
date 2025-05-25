@@ -23,6 +23,7 @@ public:
     database(QObject* parent = nullptr);
     void AddDataBase(QString driver, QString nameDB = "");
     void ConnectToDataBase(QVector<QString> data);
+    ~database();
 signals:
     void signalSendConnectionStatus(bool status);
 public:
