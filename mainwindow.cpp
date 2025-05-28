@@ -128,6 +128,10 @@ void MainWindow::GetAnnualLoadGraphic()
         messageBoxForError->setText(query->lastError().text());
         messageBoxForError->show();
     }else{
+        if(lastAnnualChartView){
+            delete lastAnnualChartView;
+            lastAnnualChartView = nullptr;
+        }
         QBarSeries* barGraph = new QBarSeries();
         QBarSet* set = new QBarSet("КОЛИЧЕСТВО ВЫЛЕТОВ/ПРИЛЁТОВ");
         QStringList months;
@@ -155,6 +159,7 @@ void MainWindow::GetAnnualLoadGraphic()
         QChartView* chartView = new QChartView(chart, dialog);
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->setVisible(true);
+        lastAnnualChartView = chartView;
         emit dialog->SendAnnualLoadGraphic(chartView);
     }
 }
@@ -210,6 +215,10 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         messageBoxForError->setText(query->lastError().text());
         messageBoxForError->show();
     }else{
+        if(lastMonthlyChartView){
+            delete lastMonthlyChartView;
+            lastMonthlyChartView = nullptr;
+        }
         QLineSeries* lineGraph = new QLineSeries();
         lineGraph->setName("КОЛИЧЕСТВО ВЫЛЕТОВ/ПРИЛЁТОВ");
         while(query->next()){
@@ -237,6 +246,7 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         QChartView* chartView = new QChartView(chart, dialog);
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->setVisible(true);
+        lastMonthlyChartView = chartView;
         emit dialog->SendMonthlyLoadGraphic(chartView);
     }
 }
@@ -263,6 +273,8 @@ MainWindow::~MainWindow()
     delete ui;
     delete dialog;
     delete query;
+    delete lastAnnualChartView;
+    delete lastMonthlyChartView;
 }
 
 void MainWindow::ReceiveStatusConnectionToDataBase(bool status)

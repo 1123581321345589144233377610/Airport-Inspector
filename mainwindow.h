@@ -40,5 +40,7 @@ private:
     QTimer* reconnectTimer;
     QSqlQuery* query;
     statisticwindow* dialog = nullptr;
+    QChartView* lastAnnualChartView = nullptr;
+    QChartView* lastMonthlyChartView = nullptr;
 };
 #endif // MAINWINDOW_H
