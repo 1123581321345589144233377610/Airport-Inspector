@@ -129,6 +129,20 @@ void MainWindow::GetAnnualLoadGraphic()
         messageBoxForError->show();
     }else{
         if(lastAnnualChartView){
+            QChart* lastAnnualChart = lastAnnualChartView->chart();
+            if(lastAnnualChart){
+                const auto seriesList = lastAnnualChart->series();
+                for(auto *series : seriesList){
+                    lastAnnualChart->removeSeries(series);
+                    delete series;
+                }
+                const auto axes = lastAnnualChart->axes();
+                for(auto *axis : axes){
+                    lastAnnualChart->removeAxis(axis);
+                    delete axis;
+                }
+                delete lastAnnualChart;
+            }
             delete lastAnnualChartView;
             lastAnnualChartView = nullptr;
         }
@@ -216,6 +230,20 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         messageBoxForError->show();
     }else{
         if(lastMonthlyChartView){
+            QChart* lastMonthlyChart = lastMonthlyChartView->chart();
+            if(lastMonthlyChart){
+                const auto seriesList = lastMonthlyChart->series();
+                for(auto *series : seriesList){
+                    lastMonthlyChart->removeSeries(series);
+                    delete series;
+                }
+                const auto axes = lastMonthlyChart->axes();
+                for(auto *axis : axes){
+                    lastMonthlyChart->removeAxis(axis);
+                    delete axis;
+                }
+                delete lastMonthlyChart;
+            }
             delete lastMonthlyChartView;
             lastMonthlyChartView = nullptr;
         }
