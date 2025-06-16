@@ -10,6 +10,13 @@
     <height>668</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Arial Rounded MT</family>
+    <pointsize>12</pointsize>
+    <bold>true</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -41,7 +48,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="annualLoad">
       <property name="font">

@@ -6,7 +6,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Расписание рейсов");
     ui->dataBaseStatus->setText("ОТКЛЮЧЕНО");
+    ui->dataBaseStatus->setStyleSheet("color: rgb(227, 38, 54)");
     ui->comboBox->setEnabled(false);
     ui->dateEdit->setEnabled(false);
     ui->radioButtonArrival->setEnabled(false);
@@ -210,12 +212,23 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
     QDate monthEnd = monthStart.addMonths(1);
     int firstDay = 1;
     int lastDay = monthStart.daysInMonth();
-    query->prepare("SELECT count(flight_no), date_trunc('day', scheduled_departure) as \"Day\""
-        " FROM bookings.flights f"
-        " WHERE scheduled_departure::date >= date(:monthStart)"
-        " AND scheduled_departure::date < date(:monthEnd)"
-        " AND (departure_airport = :airportCode OR arrival_airport = :airportCode)"
-        " GROUP BY \"Day\"");
+    query->prepare(
+        "SELECT COUNT(*) AS count, the_day "
+        "FROM ("
+        "SELECT scheduled_departure::date AS the_day "
+        "FROM bookings.flights "
+        "WHERE departure_airport = :airportCode "
+        "AND scheduled_departure::date >= :monthStart "
+        "AND scheduled_departure::date < :monthEnd "
+        "UNION ALL "
+        "SELECT scheduled_arrival::date AS the_day "
+        "FROM bookings.flights "
+        "WHERE arrival_airport = :airportCode "
+        "AND scheduled_arrival::date >= :monthStart "
+        "AND scheduled_arrival::date < :monthEnd"
+        ") AS combined "
+        "GROUP BY the_day "
+        "ORDER BY the_day");
     query->bindValue(":monthStart", monthStart.toString(Qt::ISODate));
     query->bindValue(":monthEnd", monthEnd.toString(Qt::ISODate));
     query->bindValue(":airportCode", airportCode);
@@ -230,43 +243,42 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         messageBoxForError->show();
     }else{
         if(lastMonthlyChartView){
-            QChart* lastMonthlyChart = lastMonthlyChartView->chart();
-            if(lastMonthlyChart){
-                const auto seriesList = lastMonthlyChart->series();
-                for(auto *series : seriesList){
-                    lastMonthlyChart->removeSeries(series);
-                    delete series;
-                }
-                const auto axes = lastMonthlyChart->axes();
-                for(auto *axis : axes){
-                    lastMonthlyChart->removeAxis(axis);
-                    delete axis;
-                }
-                delete lastMonthlyChart;
-            }
+            delete lastMonthlyChartView->chart();
             delete lastMonthlyChartView;
             lastMonthlyChartView = nullptr;
         }
         QLineSeries* lineGraph = new QLineSeries();
         lineGraph->setName("КОЛИЧЕСТВО ВЫЛЕТОВ/ПРИЛЁТОВ");
+        QMap<int, int> dayData;
+        for(int day = 1; day <= lastDay; ++day){
+            dayData[day] = 0;
+        }
         while(query->next()){
-            QDateTime dayDateTime = query->value("Day").toDateTime();
-            QDate date = dayDateTime.date();
+            QDate date = query->value("the_day").toDate();
             int dayNumber = date.day();
             int flightCount = query->value("count").toInt();
-            lineGraph->append(dayNumber, flightCount);
+            if(dayNumber >= 1 && dayNumber <= lastDay){
+                dayData[dayNumber] = flightCount;
+            }
+        }
+        for(int day = 1; day <= lastDay; ++day){
+            lineGraph->append(day, dayData[day]);
         }
         QChart* chart = new QChart();
         chart->addSeries(lineGraph);
         chart->setAnimationOptions(QChart::SeriesAnimations);
         QValueAxis* axisX = new QValueAxis();
         axisX->setRange(firstDay, lastDay);
-        axisX->setLabelFormat("%.0f");
+        axisX->setLabelFormat("%d");
+        axisX->setTickCount(qMin(lastDay, 31));
         axisX->setTickInterval(1);
-        axisX->setTickCount(lastDay + 1);
         chart->addAxis(axisX, Qt::AlignBottom);
         lineGraph->attachAxis(axisX);
         QValueAxis* axisY = new QValueAxis();
+        auto minMax = std::minmax_element(dayData.begin(), dayData.end());
+        int minValue = *minMax.first;
+        int maxValue = *minMax.second;
+        axisY->setRange(minValue, maxValue > minValue ? maxValue : minValue + 1);
         chart->addAxis(axisY, Qt::AlignLeft);
         lineGraph->attachAxis(axisY);
         chart->legend()->setVisible(true);
@@ -275,7 +287,9 @@ void MainWindow::GetMonthlyLoad(QString month = "Январь")
         chartView->setRenderHint(QPainter::Antialiasing);
         chartView->setVisible(true);
         lastMonthlyChartView = chartView;
-        emit dialog->SendMonthlyLoadGraphic(chartView);
+        if(dialog){
+            emit dialog->SendMonthlyLoadGraphic(chartView);
+        }
     }
 }
 
@@ -309,6 +323,7 @@ void MainWindow::ReceiveStatusConnectionToDataBase(bool status)
 {
     if(status){
         ui->dataBaseStatus->setText("ПОДКЛЮЧЕНО");
+        ui->dataBaseStatus->setStyleSheet("color: rgb(64, 130, 109)");
         ui->comboBox->setEnabled(true);
         ui->dateEdit->setEnabled(true);
         ui->radioButtonArrival->setEnabled(true);

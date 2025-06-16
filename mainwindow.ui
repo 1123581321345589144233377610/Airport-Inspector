@@ -10,6 +10,13 @@
     <height>679</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Arial Rounded MT</family>
+    <pointsize>12</pointsize>
+    <bold>true</bold>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -54,7 +61,7 @@
            <second>0</second>
            <year>2016</year>
            <month>9</month>
-           <day>14</day>
+           <day>13</day>
           </datetime>
          </property>
          <property name="maximumDateTime">
@@ -166,7 +173,7 @@
      <x>0</x>
      <y>0</y>
      <width>713</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

@@ -5,6 +5,7 @@
 statisticwindow::statisticwindow(QWidget *parent) : QDialog{parent}, ui(new Ui::statisticwindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Статистика");
     connect(ui->closeWindow, &QPushButton::clicked, this, [&](){
         QDialog::close();
     });
